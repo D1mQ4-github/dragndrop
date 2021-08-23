@@ -13,12 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // if user is drag and current drag el != empty and content inside place is empty
         if (isDrag && $current[0] != null && !target.children[0]) {
             //Clear all prev places
-            $places.forEach(i => i.removeAttribute('data-draggable'));
+            $places.forEach(i => {
+                if (i.getAttribute('data-draggable') == null) {
+                    i.removeAttribute('data-draggable')
+                }
+            });
             //set current place data-attr
             target.setAttribute('data-draggable', '');
 
             //set content pos to current place
             $current[0].style.transform = `translate(0, 0)`;
+            $current[0].style.animation = `stacked .5s`;
 
             //push content to current place
             target.append($current[0]);
