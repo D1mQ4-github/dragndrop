@@ -12,18 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // if user is drag and current drag el != empty and content inside place is empty
         if (isDrag && $current[0] != null && !target.children[0]) {
-            //Clear all prev places
-            $places.forEach(i => {
-                if (i.getAttribute('data-draggable') == null) {
-                    i.removeAttribute('data-draggable')
-                }
-            });
+
             //set current place data-attr
             target.setAttribute('data-draggable', '');
 
             //set content pos to current place
             $current[0].style.transform = `translate(0, 0)`;
-            $current[0].style.animation = `stacked .5s`;
+            $current[0].style.animation = `stacked .4s`;
 
             //push content to current place
             target.append($current[0]);
@@ -39,9 +34,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isDrag = false;
 
+        //return to prev position if try to drop in the non-empty place
+        if (target.getAttribute('data-draggable') != null && $current != null) {
+            $current[0].style.transform = `translate(0, 0)`;
+        }
+
+        //return back if mouseup in non-place elements
         if (target == $wrapper && $current != null) {
             $current[0].style.transform = `translate(0, 0)`;
         }
+
+        //Clear all prev places
+        $places.forEach(i => {
+            if (!i.children[0]) {
+                i.removeAttribute('data-draggable');
+            }
+        });
+
         $wrapper.removeEventListener('mouseover', onMouseOver);
     }
 
