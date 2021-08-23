@@ -1,55 +1,81 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let $places = document.querySelectorAll('[data-dnd-place]'),
-        $draggable = document.querySelectorAll('[data-draggable]'),
-        isDrag = false,
-        $current = null,
-        $last = null,
-        startX = 0,
-        startY = 0;
+    let $wrapper = document.querySelector('[data-dnd-place]').parentElement, //get parent element of drop places
+        $places = document.querySelectorAll('[data-dnd-place]'), //get all drop places
+        isDrag = false, //drag indicator on mousedown
+        $current = null, //content dropped item
+        $last = null, //last position of dropped item for back to last place when user drop outside of places
+        startX = 0, //first click position X
+        startY = 0; //first click position Y
 
-    $places.forEach(item => {
-        item.addEventListener('mouseover', (e) => {
-            $draggable = document.querySelectorAll('[data-draggable]');
+    const onMouseOver = (e) => {
+        const target = e.target;
 
-            $draggable.forEach(item => {
-                if (item === e.target) {
-                    item.addEventListener('mousedown', (e) => {
-                        isDrag = true;
-                        $current = e.target.children;
-                        $last = e.target;
-                        startX = e.clientX;
-                        startY = e.clientY;
-                    });
-                    item.addEventListener('mouseup', (e) => {
-                        isDrag = false;
-                    });
-                }
-            });
+        // if user is drag and current drag el != empty and content inside place is empty
+        if (isDrag && $current[0] != null && !target.children[0]) {
+            //Clear all prev places
+            $places.forEach(i => i.removeAttribute('data-draggable'));
+            //set current place data-attr
+            target.setAttribute('data-draggable', '');
 
-            //if drag and current drag != emmpty and content inside place is empty
-            if (isDrag && $current[0] != null && !e.target.children[0]) {
-                //Обнуление дата аттрибутов и присваение текущему
-                $places.forEach(i => i.removeAttribute('data-draggable'));
-                e.target.setAttribute('data-draggable', '');
+            //set content pos to current place
+            $current[0].style.transform = `translate(0, 0)`;
 
-                $current[0].style.transform = `translate(0, 0)`;
+            //push content to current place
+            target.append($current[0]);
 
-                e.target.append($current[0]);
-
-                isDrag = false;
-                $current = null;
-            }
-        });
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (isDrag == true && $current[0]) {
-            let posX = e.clientX,
-                posY = e.clientY;
-
-            $current[0].style.cssText = `
-                transform: translate(${posX - startX}px, ${posY - startY}px);
-            `;
+            //reset settings
+            isDrag = false;
+            $current = null;
         }
-    });
+    }
+
+    const onMouseUp = (e) => {
+        const target = e.target;
+
+        isDrag = false;
+
+        if (target == $wrapper && $current != null) {
+            $current[0].style.transform = `translate(0, 0)`;
+        }
+        $wrapper.removeEventListener('mouseover', onMouseOver);
+    }
+
+    const onMouseDown = (e) => {
+        const target = e.target;
+
+        //if mousedown on item with content (dropped)
+        if (target.getAttribute('data-draggable') != null) {
+            //switch to true for checking in mousemove
+            isDrag = true;
+            $current = target.children;
+            $last = target;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const onMouseMove = (e) => {
+                //checking if we mousedown on drapped item and our item have content
+                if (isDrag == true && $current != null) {
+                    //calculating position with first click pos and pos of an mousemove
+                    let posX = e.clientX - startX,
+                        posY = e.clientY - startY;
+
+                    $current[0].style.cssText = `
+                            transform: translate(${posX}px, ${posY}px);
+                        `;
+                }
+            }
+
+            //starts working with isDrag === true
+            //move the dragged content inside wrapper area
+            $wrapper.addEventListener('mousemove', onMouseMove);
+
+            //Checking which place is empty for drop
+            $wrapper.addEventListener('mouseover', onMouseOver);
+        }
+    }
+
+    //mousedown listener
+    $wrapper.addEventListener('mousedown', onMouseDown);
+
+    document.addEventListener('mouseup', onMouseUp);
 });
