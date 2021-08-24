@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
         startX = 0, //first click position X
         startY = 0; //first click position Y
 
-    const onMouseOver = (e) => {
+    const onMouseUp = (e) => {
         const target = e.target;
 
-        // if user is drag and current drag el != empty and content inside place is empty
-        if (isDrag && $current[0] != null && !target.children[0]) {
+        isDrag = false;
+
+        //if dragged content is not empty and place where we try to set is empty
+        if ($current != null && !target.children[0]) {
 
             //set current place data-attr
             target.setAttribute('data-draggable', '');
@@ -27,12 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isDrag = false;
             $current = null;
         }
-    }
-
-    const onMouseUp = (e) => {
-        const target = e.target;
-
-        isDrag = false;
 
         //return to prev position if try to drop in the non-empty place
         if (target.getAttribute('data-draggable') != null && $current != null) {
@@ -40,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         //return back if mouseup in non-place elements
-        if (target == $wrapper && $current != null) {
+        if (!target.getAttribute('data-dnd-place') && $current != null) {
             $current[0].style.transform = `translate(0, 0)`;
         }
 
@@ -50,8 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 i.removeAttribute('data-draggable');
             }
         });
-
-        $wrapper.removeEventListener('mouseover', onMouseOver);
     }
 
     const onMouseDown = (e) => {
@@ -82,9 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             //starts working with isDrag === true
             //move the dragged content inside wrapper area
             $wrapper.addEventListener('mousemove', onMouseMove);
-
-            //Checking which place is empty for drop
-            $wrapper.addEventListener('mouseover', onMouseOver);
         }
     }
 
