@@ -6,34 +6,55 @@
 }
 
 .wrapper {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
     padding: 20px;
     border: 1px solid grey;
     overflow: hidden;
+}
+
+.game-objects,
+.game-places {
+    display: flex;
+    justify-content: space-around;
+}
+
+.game-objects {
+    margin-bottom: 50px;
+}
+
+.game-places .place {
+    /* background-color: red; */
 }
 
 .place {
     max-width: 250px;
     width: 100%;
     height: 300px;
-    background-color: rgb(231, 231, 231);
-    border: 2px dotted grey;
+    /* border: 2px dotted grey; */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .box {
-    background-color: red;
     width: 100%;
     height: 100%;
     object-fit: cover;
     pointer-events: none;
     user-select: none;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
-.box svg {
+.box svg,
+.box img {
     width: 100%;
     height: 100%;
+}
+
+.box:hover svg path {
+    fill: red;
+    color: red;
 }
 
 .choice {
