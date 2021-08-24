@@ -9,15 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
         settings.forEach(item => {
             //make a template for game object
             const tmpStart = `
-                <div class="place" data-dnd-place data-dnd-is="${item.object_name}" data-draggable>
-                    <div class="box">
+                <div class="place" data-dnd-place data-draggable>
+                    <div class="box" data-dnd-is="${item.object_name}">
                         <img src="${item.object_src}" />
                     </div>
                 </div>
             `;
 
             const tmpFinal = `
-                <div class="place" data-dnd-place data-dnd-is="${item.object_name}" style="transform: rotate(${Math.random() * 360}deg); filter: brightness(0);background-image: url(${item.object_src});">
+                <div class="place" data-dnd-place data-dnd-is="${item.object_name}" style="filter: brightness(0);background-image: url(${item.object_src});">
                 </div>
             `;
 
@@ -53,15 +53,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.append($current[0]);
 
                 //if current pos data-is = the same data name that place
-                if ($last.getAttribute('data-dnd-is') == target.getAttribute('data-dnd-is')) {
+                if (target.children[0].getAttribute('data-dnd-is') == target.getAttribute('data-dnd-is')) {
                     target.style.filter = 'brightness(1)';
                     target.style.background = 'none';
-                    target.style.transform = 'rotate(0deg)';
                     target.removeAttribute('data-draggable');
                     console.log(target);
                 }
 
-                console.log(document.querySelectorAll('[data-draggable]').length);
+                //check if game is end (if data-draggable length <= 1)
+                if (document.querySelectorAll('[data-draggable]').length <= 1) {
+                    $wrapper.style.transition = '.4s';
+                    $wrapper.style.opacity = '0';
+
+                    setTimeout(() => {
+                        $wrapper.style.opacity = '1';
+                        $wrapper.innerHTML = `<h1 style="text-align: center">Level complete</h1>`;
+                    }, 1000);
+                }
 
                 //reset settings
                 isDrag = false;
